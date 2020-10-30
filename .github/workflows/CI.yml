@@ -1,0 +1,46 @@
+name: CI
+on:
+  - push
+  - pull_request
+jobs:
+  test:
+    name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # arch: [x64, x86]
+        # os: [ubuntu-latest, windows-latest, macOS-latest]
+        # version: ["1.4", "1.5", "nightly"]
+        include:
+          - arch: "x64"
+            os: "ubuntu-latest"
+            version: "1.4"
+          - arch: "x64"
+            os: "ubuntu-latest"
+            version: "1.5"
+          - arch: "x64"
+            os: "windows-latest"
+            version: "1.5"
+          - arch: "x64"
+            os: "macOS-latest"
+            version: "1.5"
+          # Temporarily disabled; see
+          # <https://github.com/JuliaLang/julia/issues/37819>
+          # - arch: "x86"
+          #   os: "ubuntu-latest"
+          #   # version: "1.5"
+          #   version: "nightly"
+          # Nightly cannot handle Manifest.toml written by 1.5
+          # - arch: "x64"
+          #   os: "ubuntu-latest"
+          #   version: "nightly"
+    steps:
+      - uses: actions/checkout@v2
+      - uses: julia-actions/setup-julia@v1
+        with:
+          version: ${{ matrix.version }}
+          arch: ${{ matrix.arch }}
+      - uses: julia-actions/julia-buildpkg@latest
+        env:
+          PYTHON:
+      - uses: julia-actions/julia-runtest@latest
